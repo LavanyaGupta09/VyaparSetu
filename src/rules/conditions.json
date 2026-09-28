@@ -1,0 +1,38 @@
+[
+  {
+    "id": "rule_pollution_1",
+    "approvalId": "app_pollution",
+    "condition": "investment > 1000000 || hazardous === true",
+    "effectiveFrom": "2023-01-01",
+    "version": "v1.2",
+    "sourceLabel": "Water (Prevention and Control of Pollution) Act, 1974",
+    "verificationStatus": "Demo Rule"
+  },
+  {
+    "id": "rule_fire_1",
+    "approvalId": "app_fire",
+    "condition": "employees >= 20 || construction === true",
+    "effectiveFrom": "2022-06-15",
+    "version": "v2.0",
+    "sourceLabel": "Maharashtra Fire Prevention and Life Safety Measures Act, 2006",
+    "verificationStatus": "Authority verification required"
+  },
+  {
+    "id": "rule_fssai_1",
+    "approvalId": "app_fssai",
+    "condition": "industry === 'Food Processing'",
+    "effectiveFrom": "2024-01-01",
+    "version": "v3.1",
+    "sourceLabel": "Food Safety and Standards Act, 2006",
+    "verificationStatus": "Demo Rule"
+  },
+  {
+    "id": "rule_building_1",
+    "approvalId": "app_building_plan",
+    "condition": "construction === true",
+    "effectiveFrom": "2021-04-01",
+    "version": "v1.0",
+    "sourceLabel": "MRTP Act, 1966",
+    "verificationStatus": "Demo Rule"
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "id": "app_pollution",
+    "name": "Pollution Consent to Establish (CTE)",
+    "authority": "Maharashtra Pollution Control Board (MPCB)",
+    "department": "Environment",
+    "description": "Required for industries that may discharge effluents or emit pollutants.",
+    "plainLanguageExplanation": "Your factory may need environmental approval before starting construction or operations.",
+    "estimatedTimelineDays": [15, 30],
+    "slaDays": 30,
+    "documentsRequired": ["site_plan", "process_flow", "project_report"],
+    "dependsOn": [],
+    "inspectionRequired": true,
+    "renewalCycleMonths": 60
+  },
+  {
+    "id": "app_fire",
+    "name": "Fire Safety NOC",
+    "authority": "Maharashtra Fire Services",
+    "department": "Home",
+    "description": "Mandatory safety clearance for factory buildings and commercial structures.",
+    "plainLanguageExplanation": "Ensures your building meets safety standards to protect workers from fire hazards.",
+    "estimatedTimelineDays": [10, 20],
+    "slaDays": 21,
+    "documentsRequired": ["building_plan", "fire_equipment_list"],
+    "dependsOn": ["app_building_plan"],
+    "inspectionRequired": true,
+    "renewalCycleMonths": 12
+  },
+  {
+    "id": "app_fssai",
+    "name": "FSSAI License",
+    "authority": "Food Safety and Standards Authority of India",
+    "department": "Health",
+    "description": "Required for any business involved in food processing, manufacturing, or distribution.",
+    "plainLanguageExplanation": "Required since your business deals with food, ensuring hygiene and safety standards.",
+    "estimatedTimelineDays": [20, 45],
+    "slaDays": 60,
+    "documentsRequired": ["food_safety_plan", "water_test_report", "incorporation_cert"],
+    "dependsOn": [],
+    "inspectionRequired": true,
+    "renewalCycleMonths": 12
+  },
+  {
+    "id": "app_building_plan",
+    "name": "Building Plan Approval",
+    "authority": "Local Municipal Corporation / MIDC",
+    "department": "Urban Development",
+    "description": "Approval of architectural and structural plans before construction begins.",
+    "plainLanguageExplanation": "Permission from the local authority confirming your factory design is structurally safe.",
+    "estimatedTimelineDays": [30, 60],
+    "slaDays": 45,
+    "documentsRequired": ["architect_drawings", "land_ownership_proof", "survey_map"],
+    "dependsOn": [],
+    "inspectionRequired": false
+  }
+]
