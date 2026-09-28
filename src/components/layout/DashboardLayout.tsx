@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, CheckSquare, Calendar, Compass, MessageSquare, Menu, Bell, User, Globe, Briefcase, Shield, MapPin, Layers, ChevronDown, Eye, Database } from 'lucide-react';
+import { LayoutDashboard, FileText, CheckSquare, Calendar, Compass, MessageSquare, Menu, Bell, User, Globe, Briefcase, Shield, MapPin, Layers, ChevronDown, Eye, Database, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useUserRole } from '../../context/UserRoleContext';
 
-const Sidebar = () => {
-  const location = useLocation();
-  const { t } = useTranslation();
+const SidebarContent = ({ location, t, onClose }: any) => {
   const navigation = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { name: 'My Applications', href: '/applications', icon: FileText },
@@ -22,9 +20,14 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="hidden md:flex flex-col w-64 border-r border-slate-200 bg-white h-full">
-      <div className="h-16 flex items-center px-6 border-b border-slate-200">
+    <>
+      <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200 shrink-0">
         <span className="text-xl font-bold text-primary-900 tracking-tight">MAHA-SETU</span>
+        {onClose && (
+          <button onClick={onClose} className="md:hidden text-slate-500 hover:text-slate-700">
+            <X className="h-6 w-6" />
+          </button>
+        )}
       </div>
       <div className="flex-1 overflow-y-auto py-4">
         <nav className="space-y-1 px-3">
@@ -34,6 +37,7 @@ const Sidebar = () => {
               <Link
                 key={item.name}
                 to={item.href}
+                onClick={onClose}
                 className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                   isActive
                     ? 'bg-primary-50 text-accent-hover'
@@ -52,15 +56,17 @@ const Sidebar = () => {
           })}
         </nav>
       </div>
-    </div>
+    </>
   );
 };
 
 const DashboardLayout = () => {
-  const { i18n } = useTranslation();
+  const location = useLocation();
+  const { t, i18n } = useTranslation();
   const { role, setRole } = useUserRole();
   const [selectedClient, setSelectedClient] = useState('Shree Foods Pvt Ltd');
   const [highContrast, setHighContrast] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleContrast = () => {
     setHighContrast(!highContrast);
@@ -75,11 +81,33 @@ const DashboardLayout = () => {
 
   return (
     <div className="h-screen flex overflow-hidden bg-slate-50">
-      <Sidebar />
+      {/* Mobile sidebar overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-40 flex md:hidden">
+          <div className="fixed inset-0 bg-slate-900/80 transition-opacity" onClick={() => setMobileMenuOpen(false)}></div>
+          <div className="relative flex w-full max-w-xs flex-1 flex-col bg-white">
+            <SidebarContent location={location} t={t} onClose={() => setMobileMenuOpen(false)} />
+          </div>
+        </div>
+      )}
+
+      {/* Desktop sidebar */}
+      <div className="hidden md:flex flex-col w-64 border-r border-slate-200 bg-white h-full">
+        <SidebarContent location={location} t={t} />
+      </div>
+
       <div className="flex flex-col w-0 flex-1 overflow-hidden">
         <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">
           <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center md:hidden">
+            <div className="flex items-center md:hidden gap-3">
+              <button
+                type="button"
+                className="-ml-2 h-10 w-10 inline-flex items-center justify-center rounded-md text-slate-500 hover:text-slate-900 focus:outline-none"
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <span className="sr-only">Open sidebar</span>
+                <Menu className="h-6 w-6" aria-hidden="true" />
+              </button>
               <span className="text-lg font-bold text-primary-900 tracking-tight">MAHA-SETU</span>
             </div>
             <div className="flex items-center justify-end w-full space-x-4">
