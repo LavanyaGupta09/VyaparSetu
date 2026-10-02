@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Line, Html } from '@react-three/drei';
+import { OrbitControls, Line, Html, Bounds } from '@react-three/drei';
 import * as THREE from 'three';
 import { useReducedMotion } from 'framer-motion';
 
@@ -50,9 +50,9 @@ const Node = ({ position, label, isSelected, onClick, color = '#3b82f6' }: any) 
           emissive={isSelected ? '#3b82f6' : '#000000'}
           emissiveIntensity={0.5}
         />
-        <Html transform center position={[0, 0, 0.11]} style={{ pointerEvents: 'none' }} distanceFactor={8}>
-          <div className="w-48 flex flex-col items-center justify-center text-center">
-            <span className="text-white font-semibold text-base leading-tight drop-shadow-md">
+        <Html center style={{ pointerEvents: 'none', whiteSpace: 'nowrap' }}>
+          <div className="px-3 py-1.5 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10 shadow-xl">
+            <span className="text-white font-semibold text-sm leading-tight drop-shadow-md">
               {label}
             </span>
           </div>
@@ -119,38 +119,41 @@ export const DependencyGraph3D: React.FC<DependencyGraph3DProps> = ({ nodes, edg
   return (
     <div className="w-full h-full min-h-[500px] cursor-grab active:cursor-grabbing bg-slate-900 rounded-2xl overflow-hidden relative">
       <ErrorBoundary fallback={fallback2D}>
-        <Canvas camera={{ position: [0, 0, 10], fov: 45 }}>
+        <Canvas camera={{ position: [0, 8, 12], fov: 45 }}>
           <ambientLight intensity={1.5} />
           <directionalLight position={[10, 20, 10]} intensity={2} />
           <pointLight position={[-10, -10, -10]} intensity={0.5} />
           
-          <group position={[0, -0.5, 0]}>
-            {edges.map((edge, idx) => {
-              const start = nodePositions[edge.source];
-              const end = nodePositions[edge.target];
-              if (!start || !end) return null;
-              return <Edge key={idx} start={start} end={end} />;
-            })}
+          <Bounds fit clip observe margin={1.5}>
+            <group position={[0, -0.5, 0]}>
+              {edges.map((edge, idx) => {
+                const start = nodePositions[edge.source];
+                const end = nodePositions[edge.target];
+                if (!start || !end) return null;
+                return <Edge key={idx} start={start} end={end} />;
+              })}
 
-            {nodes.map((node) => (
-              <Node 
-                key={node.id}
-                position={nodePositions[node.id]}
-                label={node.name}
-                isSelected={selectedId === node.id}
-                onClick={() => onNodeSelect(node.id)}
-                color={node.department === 'MIDC' ? '#10b981' : '#3b82f6'}
-              />
-            ))}
-          </group>
+              {nodes.map((node) => (
+                <Node 
+                  key={node.id}
+                  position={nodePositions[node.id]}
+                  label={node.name}
+                  isSelected={selectedId === node.id}
+                  onClick={() => onNodeSelect(node.id)}
+                  color={node.department === 'MIDC' ? '#10b981' : '#3b82f6'}
+                />
+              ))}
+            </group>
+          </Bounds>
 
           <OrbitControls 
+            makeDefault
             enableZoom={true} 
-            minDistance={4} 
-            maxDistance={20}
-            enablePan={false}
+            minDistance={2} 
+            maxDistance={40}
+            enablePan={true}
             maxPolarAngle={Math.PI / 1.5}
-            minPolarAngle={Math.PI / 6}
+            minPolarAngle={Math.PI / 8}
           />
         </Canvas>
       </ErrorBoundary>
