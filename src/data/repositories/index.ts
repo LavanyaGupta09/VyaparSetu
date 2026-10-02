@@ -13,15 +13,18 @@ const supabaseRepo = new SupabaseRepository();
 export const getApplicationRepository = async (): Promise<IApplicationRepository> => {
   const isDemoMode = localStorage.getItem('maha_demo_mode') === 'true';
   
-  if (isDemoMode || !isSupabaseConfigured()) {
+  if (isDemoMode) {
     return mockRepo;
   }
 
-  // Check if user is signed in to Supabase
-  const { data: { session } } = await supabase!.auth.getSession();
-  if (session) {
-    return supabaseRepo;
+  if (!isSupabaseConfigured()) {
+    throw new Error("Supabase is not configured. Please add environment variables.");
   }
 
-  return mockRepo;
+  const { data: { session } } = await supabase!.auth.getSession();
+  if (!session) {
+    throw new Error("User is not authenticated. Please log in.");
+  }
+
+  return supabaseRepo;
 };

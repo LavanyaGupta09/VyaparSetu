@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, CheckSquare, Calendar, Compass, MessageSquare, Menu, Bell, User, Globe, Briefcase, Shield, MapPin, Layers, ChevronDown, Eye, Database, X } from 'lucide-react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { supabase } from '../../lib/supabase';
+import { LayoutDashboard, FileText, CheckSquare, Calendar, Compass, MessageSquare, Menu, Bell, User, Globe, Briefcase, Shield, MapPin, Layers, ChevronDown, Eye, Database, X, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useUserRole } from '../../context/UserRoleContext';
 import { motion } from 'framer-motion';
@@ -74,11 +75,42 @@ const SidebarContent = ({ location, t, onClose }: any) => {
 
 const DashboardLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { role, setRole } = useUserRole();
   const [selectedClient, setSelectedClient] = useState('Shree Foods Pvt Ltd');
   const [highContrast, setHighContrast] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  React.useEffect(() => {
+    const isDemoMode = localStorage.getItem('maha_demo_mode') === 'true';
+    if (isDemoMode) {
+      setAuthChecked(true);
+      return;
+    }
+    
+    if (!supabase) {
+      navigate('/auth');
+      return;
+    }
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        navigate('/auth');
+      } else {
+        setAuthChecked(true);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session && !isDemoMode) {
+        navigate('/auth');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const toggleContrast = () => {
     setHighContrast(!highContrast);
@@ -90,6 +122,10 @@ const DashboardLayout = () => {
       document.body.style.filter = 'none';
     }
   };
+
+  if (!authChecked) {
+    return <div className="h-screen flex items-center justify-center bg-slate-50"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>;
+  }
 
   return (
     <div className="h-screen flex overflow-hidden bg-slate-50">
@@ -173,11 +209,26 @@ const DashboardLayout = () => {
               <button className="text-slate-400 hover:text-slate-500">
                 <Bell className="h-5 w-5" />
               </button>
-              <div className="flex items-center space-x-2">
-                <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center">
-                  <User className="h-5 w-5 text-slate-500" />
+              <div className="relative group">
+                <button className="flex items-center space-x-2 text-slate-700 hover:text-primary-900 focus:outline-none">
+                  <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center">
+                    <User className="h-5 w-5 text-slate-500" />
+                  </div>
+                  <span className="text-sm font-medium hidden sm:block">My Account</span>
+                  <ChevronDown className="w-4 h-4 text-slate-400" />
+                </button>
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-slate-100 hidden group-hover:block z-50">
+                  <button 
+                    onClick={async () => {
+                      if (supabase) await supabase.auth.signOut();
+                      localStorage.removeItem('maha_demo_mode');
+                      navigate('/auth');
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                  >
+                    Sign out
+                  </button>
                 </div>
-                <span className="text-sm font-medium text-slate-700 hidden sm:block">Rohit Sharma</span>
               </div>
             </div>
           </header>

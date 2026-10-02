@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
+import Auth from './pages/Auth';
 import Onboarding from './pages/Onboarding';
 import DashboardLayout from './components/layout/DashboardLayout';
 import DashboardRouter from './pages/DashboardRouter';
@@ -33,6 +34,7 @@ function App() {
           <CommandPalette />
           <Routes>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/auth" element={<Auth />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/verify/:id" element={<VerifyCertificate />} />
             <Route element={<DashboardLayout />}>

@@ -21,14 +21,14 @@ const LandingPage = () => {
               <a href="#help" className="text-slate-600 hover:text-slate-900 text-sm font-medium">Help</a>
             </div>
             <div className="flex items-center space-x-4">
-              <Link to="/dashboard" className="text-slate-600 hover:text-slate-900 font-medium text-sm">
+              <Link to="/auth" className="text-slate-600 hover:text-slate-900 font-medium text-sm">
                 Login
               </Link>
               <Link
-                to="/onboarding"
+                to="/auth"
                 className="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
               >
-                Try Demo
+                Get Started
               </Link>
             </div>
           </div>
@@ -54,13 +54,19 @@ const LandingPage = () => {
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
-                  to="/onboarding"
+                  to="/auth"
                   className="btn-3d bg-primary-900 hover:bg-primary-800 text-white px-8 py-3 rounded-lg font-medium transition-all flex items-center gap-2"
                 >
                   Build My Approval Roadmap <ArrowRight className="h-5 w-5" />
                 </Link>
-                <button className="btn-3d bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-8 py-3 rounded-lg font-medium transition-all">
-                  Explore Platform
+                <button 
+                  onClick={() => {
+                    localStorage.setItem('maha_demo_mode', 'true');
+                    window.location.href = '/dashboard';
+                  }} 
+                  className="btn-3d bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-8 py-3 rounded-lg font-medium transition-all"
+                >
+                  Explore with sample data (Judges)
                 </button>
               </div>
             </motion.div>
