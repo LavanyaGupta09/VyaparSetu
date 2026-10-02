@@ -42,7 +42,7 @@ const Node = ({ position, label, isSelected, onClick, color = '#3b82f6' }: any) 
         onPointerOver={(e) => { e.stopPropagation(); setHover(true); document.body.style.cursor = 'pointer'; }}
         onPointerOut={(e) => { e.stopPropagation(); setHover(false); document.body.style.cursor = 'auto'; }}
       >
-        <boxGeometry args={[2.5, 0.8, 0.2]} />
+        <boxGeometry args={[3.0, 0.8, 0.2]} />
         <meshStandardMaterial 
           color={hovered || isSelected ? '#60a5fa' : color} 
           metalness={0.1}
@@ -50,9 +50,9 @@ const Node = ({ position, label, isSelected, onClick, color = '#3b82f6' }: any) 
           emissive={isSelected ? '#3b82f6' : '#000000'}
           emissiveIntensity={0.5}
         />
-        <Html center style={{ pointerEvents: 'none', whiteSpace: 'nowrap' }}>
-          <div className="px-3 py-1.5 bg-black/40 backdrop-blur-sm rounded-lg border border-white/10 shadow-xl">
-            <span className="text-white font-semibold text-sm leading-tight drop-shadow-md">
+        <Html transform center distanceFactor={15} style={{ pointerEvents: 'none', whiteSpace: 'nowrap' }}>
+          <div className="px-4 py-2 bg-slate-900/80 backdrop-blur-md rounded-xl border border-white/20 shadow-2xl flex items-center justify-center">
+            <span className="text-white font-bold text-base leading-tight drop-shadow-md">
               {label}
             </span>
           </div>
@@ -127,8 +127,8 @@ export const DependencyGraph3D: React.FC<DependencyGraph3DProps> = ({ nodes, edg
           
           <group position={[0, -0.5, 0]}>
             {edges.map((edge, idx) => {
-              const start = nodePositions[edge.source];
-              const end = nodePositions[edge.target];
+              const start = nodePositions[edge.from];
+              const end = nodePositions[edge.to];
               if (!start || !end) return null;
               return <Edge key={idx} start={start} end={end} />;
             })}
