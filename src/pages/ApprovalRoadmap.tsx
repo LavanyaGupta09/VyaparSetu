@@ -14,7 +14,7 @@ const ApprovalRoadmap = () => {
   const [selectedApproval, setSelectedApproval] = useState<any>(null);
   const [isExplainOpen, setIsExplainOpen] = useState(false);
 
-  const mockProfile: Profile = {
+  const defaultProfile: Profile = {
     industry: 'Food Processing',
     investment: 42000000,
     employees: 35,
@@ -24,7 +24,7 @@ const ApprovalRoadmap = () => {
   };
 
   useEffect(() => {
-    const evals = evaluateProfile(mockProfile);
+    const evals = evaluateProfile(defaultProfile);
     setEvaluations(evals);
     const g = buildDependencyGraph(evals);
     setGraph(g);

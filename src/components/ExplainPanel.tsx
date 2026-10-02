@@ -18,8 +18,8 @@ const ExplainPanel: React.FC<ExplainPanelProps> = ({ evaluation, isOpen, onClose
   const { i18n } = useTranslation();
 
   const rule = evaluation?.matchedRules?.[0] || {};
-  const status = rule.verificationStatus || 'Demo Rule';
-  const confidence = status === 'Demo Rule' ? 'High' : 'Needs verification';
+  const status = rule.verificationStatus || 'Baseline Rule';
+  const confidence = status === 'Baseline Rule' ? 'High' : 'Needs verification';
 
   useEffect(() => {
     if (isOpen && rule.sourceLabel) {

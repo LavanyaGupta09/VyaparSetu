@@ -10,7 +10,10 @@ const apiSources = [
   { id: 'openmeteo_aqi', name: 'Open-Meteo AQI', endpoint: 'air-quality-api.open-meteo.com', data: 'Air Quality Index', policy: 'No key required' },
   { id: 'overpass', name: 'OSM Overpass (Proxied)', endpoint: 'overpass-api.de', data: 'Infrastructure POIs', policy: 'Strict caching applied' },
   { id: 'datagov', name: 'Data.gov.in (Proxied)', endpoint: 'data.gov.in', data: 'MSME Statistics', policy: 'API Key stored securely' },
-  { id: 'supabase', name: 'Supabase Postgres', endpoint: 'https://oggbzuxjwlpmwcnaasup.supabase.co', data: 'Auth, User Profiles & DB', policy: 'Strict RLS & JWT' }
+  { id: 'supabase', name: 'Supabase Postgres', endpoint: 'https://oggbzuxjwlpmwcnaasup.supabase.co', data: 'Auth, User Profiles & DB', policy: 'Strict RLS & JWT' },
+  { id: 'digilocker', name: 'DigiLocker (Simulated)', endpoint: 'api.digilocker.gov.in', data: 'Document Retrieval', policy: 'Simulated integration — requires official government API access' },
+  { id: 'gst', name: 'GSTIN (Simulated)', endpoint: 'api.gst.gov.in', data: 'Tax Verification', policy: 'Simulated integration — requires official government API access' },
+  { id: 'udyam', name: 'Udyam Aadhaar (Simulated)', endpoint: 'udyamregistration.gov.in', data: 'MSME Verification', policy: 'Simulated integration — requires official government API access' }
 ];
 
 const DataSources = () => {
@@ -22,6 +25,9 @@ const DataSources = () => {
     'openmeteo_aqi': 'Live',
     'overpass': 'Cached',
     'datagov': 'Live',
+    'digilocker': 'Simulated',
+    'gst': 'Simulated',
+    'udyam': 'Simulated',
   });
   
   const [loading, setLoading] = useState<string | null>(null);
@@ -50,10 +56,13 @@ const DataSources = () => {
           res = { source: 'live' };
         }
       }
+      if (['digilocker', 'gst', 'udyam'].includes(id)) {
+        res = { source: 'simulated' };
+      }
       
       setStatuses(prev => ({ 
         ...prev, 
-        [id]: res?.source === 'demo-fallback' ? 'Fallback' : (res?.source === 'cache' ? 'Cached' : 'Live')
+        [id]: res?.source === 'simulated' ? 'Simulated' : (res?.source === 'demo-fallback' ? 'Fallback' : (res?.source === 'cache' ? 'Cached' : 'Live'))
       }));
     } catch (e) {
       setStatuses(prev => ({ ...prev, [id]: 'Error' }));
@@ -106,11 +115,13 @@ const DataSources = () => {
                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
                       statuses[api.id] === 'Live' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                       statuses[api.id] === 'Cached' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                      statuses[api.id] === 'Simulated' ? 'bg-purple-50 text-purple-700 border-purple-200' :
                       statuses[api.id] === 'Testing...' ? 'bg-slate-50 text-slate-700 border-slate-200' :
                       'bg-amber-50 text-amber-700 border-amber-200'
                     }`}>
                       {statuses[api.id] === 'Live' ? <CheckCircle2 className="w-3.5 h-3.5" /> : 
                        statuses[api.id] === 'Cached' ? <Database className="w-3.5 h-3.5" /> :
+                       statuses[api.id] === 'Simulated' ? <AlertTriangle className="w-3.5 h-3.5" /> :
                        statuses[api.id] === 'Testing...' ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> :
                        <XCircle className="w-3.5 h-3.5" />}
                       {statuses[api.id]}

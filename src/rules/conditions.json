@@ -6,7 +6,7 @@
     "effectiveFrom": "2023-01-01",
     "version": "v1.2",
     "sourceLabel": "Water (Prevention and Control of Pollution) Act, 1974",
-    "verificationStatus": "Demo Rule"
+    "verificationStatus": "Baseline Rule"
   },
   {
     "id": "rule_fire_1",
@@ -24,7 +24,7 @@
     "effectiveFrom": "2024-01-01",
     "version": "v3.1",
     "sourceLabel": "Food Safety and Standards Act, 2006",
-    "verificationStatus": "Demo Rule"
+    "verificationStatus": "Baseline Rule"
   },
   {
     "id": "rule_building_1",
@@ -33,6 +33,6 @@
     "effectiveFrom": "2021-04-01",
     "version": "v1.0",
     "sourceLabel": "MRTP Act, 1966",
-    "verificationStatus": "Demo Rule"
+    "verificationStatus": "Baseline Rule"
   }
 ]
