@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Send, Bot, User, Loader2, RefreshCcw, AlertCircle, Mic, Volume2, MicOff } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import { useTranslation } from 'react-i18next';
 import { aiService } from '../services/aiService';
+import { PressableButton3D } from '../components/3d';
 
 // Mock context that would normally come from the user's profile state
 const userContext = {
@@ -185,12 +187,27 @@ const MitraAI = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-12rem)] flex flex-col bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+    <div className="h-[calc(100vh-12rem)] flex flex-col rounded-2xl border border-slate-100 shadow-sm overflow-hidden relative" style={{
+      background: 'rgba(255,255,255,0.85)',
+      backdropFilter: 'blur(16px)',
+      boxShadow: '0 8px 32px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.5)'
+    }}>
       {/* Header */}
-      <div className="p-4 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
-        <div className="w-10 h-10 bg-accent text-white rounded-full flex items-center justify-center shadow-md flex-shrink-0">
+      <div className="p-4 border-b border-slate-100/80 flex items-center gap-3 bg-slate-50/60 backdrop-blur-sm">
+        <motion.div 
+          className="w-10 h-10 bg-accent text-white rounded-full flex items-center justify-center shadow-md flex-shrink-0 relative"
+          animate={{ y: [0, -2, 0] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        >
           <Bot className="w-6 h-6" />
-        </div>
+          {isLoading && (
+            <motion.div 
+              className="absolute inset-0 rounded-full border-2 border-accent/30"
+              animate={{ scale: [1, 1.4, 1], opacity: [0.6, 0, 0.6] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            />
+          )}
+        </motion.div>
         <div>
           <h2 className="font-bold text-primary-900 leading-tight">Mitra AI</h2>
           <p className="text-xs text-emerald-600 font-medium flex items-center gap-1">
@@ -206,7 +223,13 @@ const MitraAI = () => {
             <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${msg.role === 'user' ? 'bg-primary-100 text-primary-900' : (msg.error ? 'bg-red-100 text-red-500' : 'bg-accent text-white')}`}>
               {msg.role === 'user' ? <User className="w-5 h-5" /> : (msg.error ? <AlertCircle className="w-5 h-5" /> : <Bot className="w-5 h-5" />)}
             </div>
-            <div className={`max-w-[80%] ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+            <motion.div 
+              className={`max-w-[80%] ${msg.role === 'user' ? 'text-right' : 'text-left'}`}
+              initial={{ opacity: 0, y: 10, rotateX: 8 }}
+              animate={{ opacity: 1, y: 0, rotateX: 0 }}
+              transition={{ duration: 0.3, type: 'spring', stiffness: 300, damping: 25 }}
+              style={{ transformPerspective: 1000 }}
+            >
               <div className={`inline-block p-4 rounded-2xl text-sm ${
                 msg.role === 'user' 
                   ? 'bg-primary-900 text-white rounded-tr-sm' 
@@ -232,7 +255,7 @@ const MitraAI = () => {
                   </button>
                 )}
               </div>
-            </div>
+            </motion.div>
           </div>
         ))}
         
@@ -287,7 +310,7 @@ const MitraAI = () => {
               type="button"
               disabled={isLoading}
               onClick={() => handleSend(suggestion)}
-              className="whitespace-nowrap text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-full transition-colors font-medium border border-slate-200 disabled:opacity-50"
+              className="whitespace-nowrap text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-full transition-all font-medium border border-slate-200 disabled:opacity-50 hover:shadow-sm hover:-translate-y-0.5"
             >
               {suggestion}
             </button>

@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, FileText, CheckSquare, Calendar, Compass, MessageSquare, Menu, Bell, User, Globe, Briefcase, Shield, MapPin, Layers, ChevronDown, Eye, Database, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useUserRole } from '../../context/UserRoleContext';
+import { motion } from 'framer-motion';
 
 const SidebarContent = ({ location, t, onClose }: any) => {
   const navigation = [
@@ -38,18 +39,29 @@ const SidebarContent = ({ location, t, onClose }: any) => {
                 key={item.name}
                 to={item.href}
                 onClick={onClose}
-                className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all ${
                   isActive
                     ? 'bg-primary-50 text-accent-hover'
                     : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
                 }`}
+                style={isActive ? {
+                  boxShadow: 'inset 0 1px 2px rgba(15,23,42,0.06), 0 1px 0 rgba(255,255,255,0.8)',
+                } : undefined}
               >
-                <item.icon
-                  className={`flex-shrink-0 mr-3 h-5 w-5 ${
-                    isActive ? 'text-accent-hover' : 'text-slate-400 group-hover:text-slate-500'
-                  }`}
-                  aria-hidden="true"
-                />
+                <div className={`flex-shrink-0 mr-3 w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
+                  isActive 
+                    ? 'bg-accent/10 shadow-sm' 
+                    : 'group-hover:bg-slate-100'
+                }`} style={isActive ? {
+                  boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), 0 1px 2px rgba(59,130,246,0.15)'
+                } : undefined}>
+                  <item.icon
+                    className={`h-4 w-4 ${
+                      isActive ? 'text-accent-hover' : 'text-slate-400 group-hover:text-slate-500'
+                    }`}
+                    aria-hidden="true"
+                  />
+                </div>
                 {t(item.name)}
               </Link>
             );

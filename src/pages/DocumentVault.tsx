@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { UploadCloud, File, CheckCircle2, AlertCircle, Eye, Search, Filter, Loader2, X, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { aiService } from '../services/aiService';
+import { TiltCard, PressableButton3D, ScrollReveal3D, Icon3D, GlassPanel } from '../components/3d';
 
 const DocumentVault = () => {
   const [documents, setDocuments] = useState([
@@ -133,35 +135,35 @@ const DocumentVault = () => {
             className="hidden" 
           />
           
-          <div 
-            onClick={() => !isUploading && fileInputRef.current?.click()}
-            className={`bg-white border-2 border-slate-200 rounded-2xl border-dashed p-8 flex flex-col items-center justify-center transition-colors text-center ${isUploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-50 hover:border-accent/50 cursor-pointer'}`}
-          >
-            {isUploading ? (
-              <div className="flex flex-col items-center text-accent">
-                <Loader2 className="w-10 h-10 animate-spin mb-4" />
-                <h3 className="text-lg font-bold mb-1">Running OCR & AI Extraction...</h3>
-                <p className="text-sm">Please wait while we securely process your document.</p>
-              </div>
-            ) : (
-              <>
-                <div className="w-16 h-16 bg-blue-50 text-accent rounded-full flex items-center justify-center mb-4">
-                  <UploadCloud className="w-8 h-8" />
+          <TiltCard maxTilt={4}>
+            <div 
+              onClick={() => !isUploading && fileInputRef.current?.click()}
+              className={`bg-white border-2 border-slate-200 rounded-2xl border-dashed p-8 flex flex-col items-center justify-center transition-colors text-center h-full ${isUploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-50 hover:border-accent/50 cursor-pointer'}`}
+            >
+              {isUploading ? (
+                <div className="flex flex-col items-center text-accent">
+                  <Loader2 className="w-10 h-10 animate-spin mb-4" />
+                  <h3 className="text-lg font-bold mb-1">Running OCR & AI Extraction...</h3>
+                  <p className="text-sm">Please wait while we securely process your document.</p>
                 </div>
-                <h3 className="text-lg font-bold text-slate-800 mb-1">Drag & drop files here or click to upload</h3>
-                <p className="text-sm text-slate-500 mb-4">Supported: PDF, JPG, PNG up to 5MB</p>
-                <button className="bg-white border border-slate-200 text-slate-700 px-6 py-2 rounded-lg font-medium shadow-sm">
-                  Select Files
-                </button>
-              </>
-            )}
-            
-            {uploadError && (
-              <div className="mt-4 text-red-500 text-sm font-medium flex items-center gap-1 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">
-                <AlertCircle className="w-4 h-4" /> {uploadError}
-              </div>
-            )}
-          </div>
+              ) : (
+                <>
+                  <Icon3D icon={UploadCloud} bgFrom="#dbeafe" bgTo="#bfdbfe" iconColor="#3b82f6" size="lg" className="mb-4" />
+                  <h3 className="text-lg font-bold text-slate-800 mb-1">Drag & drop files here or click to upload</h3>
+                  <p className="text-sm text-slate-500 mb-4">Supported: PDF, JPG, PNG up to 5MB</p>
+                  <PressableButton3D className="bg-white border border-slate-200 text-slate-700 px-6 py-2 rounded-lg font-medium">
+                    Select Files
+                  </PressableButton3D>
+                </>
+              )}
+              
+              {uploadError && (
+                <div className="mt-4 text-red-500 text-sm font-medium flex items-center gap-1 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">
+                  <AlertCircle className="w-4 h-4" /> {uploadError}
+                </div>
+              )}
+            </div>
+          </TiltCard>
 
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
@@ -266,79 +268,81 @@ const DocumentVault = () => {
               </div>
             </div>
 
-            <button 
+            <PressableButton3D 
               onClick={runAiPreCheck}
               disabled={isChecking}
               className="w-full mt-8 flex items-center justify-center bg-accent hover:bg-accent-hover text-white py-3 rounded-xl font-medium transition-colors text-sm disabled:opacity-50"
             >
               {isChecking ? <><Loader2 className="w-4 h-4 animate-spin mr-2"/> Analyzing with Groq AI...</> : "Run Groq AI Pre-Check"}
-            </button>
+            </PressableButton3D>
           </div>
         </div>
       </div>
 
       {/* OCR Review Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-              <div>
-                <h3 className="font-bold text-lg text-primary-900 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-accent" /> AI/OCR Extracted Data
-                </h3>
-                <p className="text-sm text-slate-500">Please verify the extracted information before saving.</p>
-              </div>
-              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-700">
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            
-            <div className="p-6 overflow-y-auto flex-1 space-y-4">
-              <div className="bg-blue-50 border border-blue-100 text-blue-700 px-4 py-3 rounded-lg text-sm flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                <p>We extracted the following fields from <strong>{currentFile?.name}</strong>. You can edit any incorrect values below. We will never overwrite your manual entries without your permission.</p>
+      <AnimatePresence>
+        {showModal && (
+          <GlassPanel overlay isOpen onClose={() => setShowModal(false)}>
+            <div className="overflow-hidden rounded-2xl max-w-2xl w-full flex flex-col max-h-[90vh]">
+              <div className="p-5 border-b border-white/20 flex justify-between items-center bg-slate-50/80">
+                <div>
+                  <h3 className="font-bold text-lg text-primary-900 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-accent" /> AI/OCR Extracted Data
+                  </h3>
+                  <p className="text-sm text-slate-500">Please verify the extracted information before saving.</p>
+                </div>
+                <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-700">
+                  <X className="w-6 h-6" />
+                </button>
               </div>
               
-              <div className="space-y-4 mt-6">
-                {Object.entries(extractedData || {}).map(([key, value]) => (
-                  <div key={key}>
-                    <label className="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">
-                      {key.replace(/([A-Z])/g, ' $1').trim()}
-                    </label>
-                    <input 
-                      type="text" 
-                      value={value as string} 
-                      onChange={(e) => setExtractedData({...extractedData, [key]: e.target.value})}
-                      className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent text-slate-800"
-                    />
-                  </div>
-                ))}
+              <div className="p-6 overflow-y-auto flex-1 space-y-4 bg-white/90">
+                <div className="bg-blue-50 border border-blue-100 text-blue-700 px-4 py-3 rounded-lg text-sm flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <p>We extracted the following fields from <strong>{currentFile?.name}</strong>. You can edit any incorrect values below. We will never overwrite your manual entries without your permission.</p>
+                </div>
                 
-                {Object.keys(extractedData || {}).length === 0 && (
-                  <div className="text-center py-8 text-slate-500">
-                    No structured fields could be automatically extracted. You can still save the document.
-                  </div>
-                )}
+                <div className="space-y-4 mt-6">
+                  {Object.entries(extractedData || {}).map(([key, value]) => (
+                    <div key={key}>
+                      <label className="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">
+                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                      </label>
+                      <input 
+                        type="text" 
+                        value={value as string} 
+                        onChange={(e) => setExtractedData({...extractedData, [key]: e.target.value})}
+                        className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent text-slate-800"
+                      />
+                    </div>
+                  ))}
+                  
+                  {Object.keys(extractedData || {}).length === 0 && (
+                    <div className="text-center py-8 text-slate-500">
+                      No structured fields could be automatically extracted. You can still save the document.
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="p-5 border-t border-white/20 bg-slate-50/80 flex justify-end gap-3">
+                <PressableButton3D 
+                  onClick={() => setShowModal(false)}
+                  className="px-5 py-2 text-slate-600 hover:bg-slate-200 font-medium rounded-lg transition-colors bg-white border border-slate-200"
+                >
+                  Cancel
+                </PressableButton3D>
+                <PressableButton3D 
+                  onClick={handleSaveData}
+                  className="px-6 py-2 bg-primary-900 hover:bg-primary-800 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+                >
+                  <CheckCircle2 className="w-4 h-4" /> Save Verified Data
+                </PressableButton3D>
               </div>
             </div>
-            
-            <div className="p-5 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
-              <button 
-                onClick={() => setShowModal(false)}
-                className="px-5 py-2 text-slate-600 hover:bg-slate-200 font-medium rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleSaveData}
-                className="px-6 py-2 bg-primary-900 hover:bg-primary-800 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2"
-              >
-                <CheckCircle2 className="w-4 h-4" /> Save Verified Data
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          </GlassPanel>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

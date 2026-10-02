@@ -96,7 +96,6 @@
 .perspective-1000 {
   perspective: 1000px;
 }
-
 .preserve-3d {
   transform-style: preserve-3d;
 }
@@ -105,43 +104,103 @@
 .btn-3d {
   position: relative;
   transition: all 0.15s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 0 rgba(15,23,42,0.12), 0 6px 12px rgba(15,23,42,0.06), inset 0 1px 0 rgba(255,255,255,0.2);
   transform: translateY(0);
 }
-
+.btn-3d:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 rgba(15,23,42,0.12), 0 8px 16px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.2);
+}
 .btn-3d:active {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), inset 0 1px 2px rgba(0, 0, 0, 0.1);
-  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(15,23,42,0.12), 0 2px 4px rgba(15,23,42,0.05), inset 0 1px 2px rgba(15,23,42,0.08);
+  transform: translateY(3px);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .btn-3d {
-    box-shadow: none;
-    transform: none;
-    transition: none;
-  }
-  .btn-3d:active {
-    box-shadow: none;
-    transform: none;
-  }
-}
-
-/* 3D Icon Container */
-.icon-3d-container {
+/* Animated gradient mesh background */
+.gradient-mesh-bg {
   position: relative;
-  display: inline-flex;
-  transform-style: preserve-3d;
+  overflow: hidden;
 }
-.icon-3d-shadow {
+.gradient-mesh-bg::before {
+  content: '';
   position: absolute;
-  top: 4px;
-  left: 4px;
-  color: rgba(0, 0, 0, 0.15);
-  transform: translateZ(-10px);
-  filter: blur(1px);
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background: 
+    radial-gradient(ellipse at 20% 50%, rgba(59,130,246,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(99,102,241,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 20%, rgba(59,130,246,0.03) 0%, transparent 50%);
+  animation: meshFloat 20s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
 }
+
+@keyframes meshFloat {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(-3%, 2%) rotate(1deg); }
+  50% { transform: translate(2%, -1%) rotate(-1deg); }
+  75% { transform: translate(-1%, -2%) rotate(0.5deg); }
+}
+
+/* Calendar 3D cell */
+.cal-cell-3d {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.cal-cell-3d:hover {
+  transform: translateZ(8px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+  z-index: 10;
+}
+.cal-cell-raised {
+  transform: translateZ(6px);
+  box-shadow: 0 3px 8px rgba(15,23,42,0.06);
+}
+
+/* Shine sweep effect for scheme cards */
+.shine-sweep {
+  position: relative;
+  overflow: hidden;
+}
+.shine-sweep::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255,255,255,0.12) 45%,
+    rgba(255,255,255,0.25) 50%,
+    rgba(255,255,255,0.12) 55%,
+    transparent 60%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.7s ease;
+  pointer-events: none;
+}
+.shine-sweep:hover::after {
+  transform: translateX(100%);
+}
+
+/* Embossed number text */
+.text-embossed {
+  text-shadow: 0 1px 0 rgba(255,255,255,0.4), 0 -1px 0 rgba(0,0,0,0.1);
+}
+
+/* Reduced motion: disable all animations globally */
 @media (prefers-reduced-motion: reduce) {
-  .icon-3d-shadow {
-    display: none;
+  .btn-3d,
+  .cal-cell-3d,
+  .shine-sweep::after,
+  .gradient-mesh-bg::before {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+  .btn-3d {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
   }
 }
