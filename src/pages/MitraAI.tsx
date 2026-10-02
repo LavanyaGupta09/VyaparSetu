@@ -122,11 +122,11 @@ const MitraAI = () => {
       const data = await Promise.race([fetchPromise, timeoutPromise]) as any;
       clearTimeout(timeoutId);
 
-      if (data.error) {
+      if (typeof data === 'object' && data !== null && data.error) {
         throw new Error(data.error);
       }
 
-      setMessages([...newMessages, { role: 'ai', content: data.reply }]);
+      setMessages([...newMessages, { role: 'ai', content: typeof data === 'string' ? data : (data.reply || JSON.stringify(data)) }]);
     } catch (error: any) {
       console.error(`Mitra AI API Error: 500 - ${error.message}`);
       
