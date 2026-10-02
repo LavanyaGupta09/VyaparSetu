@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Activity, FileText, CheckCircle, Shield } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
