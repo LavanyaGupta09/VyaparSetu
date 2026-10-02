@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { CheckCircle2, AlertCircle, Clock, FileText, ArrowRight, Activity, Calendar, Zap, FileSearch, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useDemoControl } from '../context/DemoControlContext';
-import { TiltCard, FloatingPanel, Icon3D, PressableButton3D, ScrollReveal3D } from '../components/3d';
+import { TiltCard, FloatingPanel, Icon3D, PressableButton3D, ScrollReveal3D, CommandCenterOrbs } from '../components/3d';
 
 const EntrepreneurDashboard = () => {
   const [applications, setApplications] = useState<any[]>([]);
@@ -57,15 +57,19 @@ const EntrepreneurDashboard = () => {
                   <div className="flex items-start justify-between">
                     <div>
                       <p className={`text-sm font-medium mb-1 ${card.gradient ? 'text-blue-100' : 'text-slate-500'}`}>{card.label}</p>
-                      <h3 className={`text-3xl font-bold text-embossed ${card.color}`}>{card.value}</h3>
+                      {i === 0 ? null : <h3 className={`text-3xl font-bold text-embossed ${card.color}`}>{card.value}</h3>}
                     </div>
-                    <Icon3D 
-                      icon={card.icon} 
-                      bgFrom={card.gradient ? 'rgba(255,255,255,0.15)' : card.iconBg} 
-                      bgTo={card.gradient ? 'rgba(255,255,255,0.08)' : card.iconBg}
-                      iconColor={card.iconColor}
-                      size="md"
-                    />
+                    {i === 0 ? (
+                      <CommandCenterOrbs healthScore={78} className="w-16 h-16 ml-auto" />
+                    ) : (
+                      <Icon3D 
+                        icon={card.icon} 
+                        bgFrom={card.gradient ? 'rgba(255,255,255,0.15)' : card.iconBg} 
+                        bgTo={card.gradient ? 'rgba(255,255,255,0.08)' : card.iconBg}
+                        iconColor={card.iconColor}
+                        size="md"
+                      />
+                    )}
                   </div>
                   {card.badge && (
                     <div className={`mt-4 flex items-center text-xs font-medium ${card.badgeColor} w-fit px-2 py-1 rounded-full`}>

@@ -6,7 +6,7 @@ import ExplainPanel from '../components/ExplainPanel';
 import { calculateSlaDeadline } from '../services/publicApis';
 import { CostOfDelayWidget } from '../components/CostOfDelayWidget';
 import { Link } from 'react-router-dom';
-import { TiltCard, PressableButton3D, ScrollReveal3D, Icon3D } from '../components/3d';
+import { TiltCard, PressableButton3D, ScrollReveal3D, Icon3D, DependencyGraph3D } from '../components/3d';
 
 const ApprovalRoadmap = () => {
   const [evaluations, setEvaluations] = useState<RuleEvaluation[]>([]);
@@ -68,84 +68,16 @@ const ApprovalRoadmap = () => {
                 <p>No approvals required based on current rules.</p>
               </div>
             ) : (
-              <div className="min-w-[600px] flex flex-col items-center relative z-10">
-                {/* Start Node */}
-                <div className="flex justify-center mb-8">
-                  <motion.div 
-                    className="bg-primary-50 text-primary-700 px-6 py-2 rounded-full font-semibold border border-primary-100 text-sm"
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                  >
-                    START
-                  </motion.div>
-                </div>
-
-                {/* Graph Nodes */}
-                <div className="flex flex-wrap justify-center gap-8 mb-8 relative w-full" style={{ perspective: 1200 }}>
-                  {graph.nodes.map((node, i) => {
-                    const ev = evaluations.find(e => e.approval.id === node.id);
-                    const isSelected = selectedApproval?.approval.id === node.id;
-                    
-                    return (
-                      <motion.div 
-                        key={node.id} 
-                        className="flex flex-col items-center relative"
-                        style={{ transformStyle: 'preserve-3d' }}
-                        onClick={() => setSelectedApproval(ev)}
-                        initial={{ opacity: 0, rotateX: 20, y: 30 }}
-                        animate={{ opacity: 1, rotateX: 0, y: 0 }}
-                        transition={{ delay: i * 0.1, type: 'spring', stiffness: 200, damping: 22 }}
-                        whileHover={{ 
-                          scale: 1.06, 
-                          rotateX: 5, 
-                          rotateY: -4,
-                          y: -4,
-                          transition: { type: 'spring', stiffness: 400, damping: 25 }
-                        }}
-                      >
-                        {i > 0 && (
-                          <div className="absolute w-8 h-0.5 top-1/2 -left-8" style={{ 
-                            background: 'linear-gradient(90deg, #cbd5e1, #94a3b8)',
-                            transform: 'translateZ(-5px)'
-                          }} />
-                        )}
-                        <div className={`border-2 rounded-xl p-4 w-64 flex flex-col items-center relative z-10 cursor-pointer transition-all bg-white ${
-                          isSelected 
-                            ? 'border-accent ring-4 ring-accent/10 shadow-xl shadow-accent/10' 
-                            : 'border-slate-200 hover:border-accent/50 shadow-md'
-                        }`} style={{
-                          boxShadow: isSelected 
-                            ? '0 8px 24px rgba(59,130,246,0.15), 0 2px 4px rgba(15,23,42,0.06)'
-                            : '0 4px 12px rgba(15,23,42,0.06), 0 1px 3px rgba(15,23,42,0.04)',
-                        }}>
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center mb-3" style={{
-                            background: isSelected ? 'linear-gradient(135deg, #dbeafe, #bfdbfe)' : 'linear-gradient(135deg, #f8fafc, #f1f5f9)',
-                            boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.6), 0 1px 2px rgba(15,23,42,0.06)'
-                          }}>
-                            <CheckCircle2 className={`w-5 h-5 ${isSelected ? 'text-accent' : 'text-slate-400'}`} />
-                          </div>
-                          <h3 className="font-semibold text-slate-800 text-sm text-center">{node.name}</h3>
-                          <span className="text-xs font-medium text-slate-500 mt-1.5 px-2 py-0.5 bg-slate-50 rounded">
-                            {node.department}
-                          </span>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-
-                {/* End Node */}
-                <div className="flex justify-center mt-8">
-                  <motion.div 
-                    className="bg-emerald-50 text-emerald-700 px-6 py-2 rounded-full font-semibold border border-emerald-100 text-sm"
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 25 }}
-                  >
-                    READY FOR OPERATIONS
-                  </motion.div>
-                </div>
+              <div className="h-full w-full relative z-10 p-2">
+                <DependencyGraph3D 
+                  nodes={graph.nodes}
+                  edges={graph.edges}
+                  onNodeSelect={(id) => {
+                    const ev = evaluations.find(e => e.approval.id === id);
+                    setSelectedApproval(ev);
+                  }}
+                  selectedId={selectedApproval?.approval.id || null}
+                />
               </div>
             )}
           </div>
