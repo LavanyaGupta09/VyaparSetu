@@ -4,6 +4,7 @@ import { CheckCircle2, UploadCloud, File, AlertCircle, Loader2, ArrowLeft, Send 
 import { aiService } from '../services/aiService';
 import { fetchIfsc, validators } from '../services/publicApis';
 import { useApplications } from '../hooks/useApplications';
+import { supabase } from '../lib/supabase';
 
 const ApplicationForm = () => {
   const [searchParams] = useSearchParams();
@@ -52,13 +53,38 @@ const ApplicationForm = () => {
   const handleNext = () => setStep(s => s + 1);
   const handleBack = () => setStep(s => s - 1);
   
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      
+      let uploadedPath = '';
+      try {
+        if (supabase) {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            const fileName = `${Date.now()}_${file.name}`;
+            const filePath = `${session.user.id}/${fileName}`;
+            
+            const { error: uploadErr } = await supabase.storage
+              .from('documents')
+              .upload(filePath, file);
+              
+            if (uploadErr) {
+              console.error('Storage upload error:', uploadErr);
+            } else {
+              uploadedPath = filePath;
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Upload failed:', err);
+      }
+      
       setDocument({
         name: file.name,
         type: file.type,
-        size: (file.size / 1024 / 1024).toFixed(2) + ' MB'
+        size: (file.size / 1024 / 1024).toFixed(2) + ' MB',
+        path: uploadedPath
       });
     }
   };

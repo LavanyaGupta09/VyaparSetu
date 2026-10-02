@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { UploadCloud, File, CheckCircle2, AlertCircle, Eye, Search, Filter, Loader2, X, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { aiService } from '../services/aiService';
+import { supabase } from '../lib/supabase';
 import { TiltCard, PressableButton3D, ScrollReveal3D, Icon3D, GlassPanel } from '../components/3d';
 
 const DocumentVault = () => {
@@ -23,15 +24,42 @@ const DocumentVault = () => {
   // Modal states
   const [showModal, setShowModal] = useState(false);
   const [extractedData, setExtractedData] = useState<any>(null);
-  const [currentFile, setCurrentFile] = useState<{name: string, type: string} | null>(null);
+  const [currentFile, setCurrentFile] = useState<{name: string, type: string, path?: string} | null>(null);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setUploadError('');
     setIsUploading(true);
-    setCurrentFile({ name: file.name, type: file.type });
+    
+    let uploadedPath = '';
+    
+    try {
+      if (supabase) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          const fileName = `${Date.now()}_${file.name}`;
+          const filePath = `${session.user.id}/${fileName}`;
+          
+          const { error: uploadErr } = await supabase.storage
+            .from('documents')
+            .upload(filePath, file);
+            
+          if (uploadErr) {
+            console.error('Storage upload error:', uploadErr);
+            throw new Error('Failed to upload to secure storage');
+          }
+          uploadedPath = filePath;
+        }
+      }
+    } catch (err: any) {
+      setUploadError(err.message);
+      setIsUploading(false);
+      return;
+    }
+
+    setCurrentFile({ name: file.name, type: file.type, path: uploadedPath });
 
     const reader = new FileReader();
     reader.onloadend = async () => {
@@ -70,7 +98,8 @@ const DocumentVault = () => {
       review: false,
       missing: false,
       date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-      data: extractedData
+      data: extractedData,
+      path: currentFile.path
     };
 
     // Check if replacing missing document or adding new
@@ -96,7 +125,8 @@ const DocumentVault = () => {
   const runAiPreCheck = async () => {
     setIsChecking(true);
     try {
-      const result = await aiService.validateDocument("Site Plan", "PDF");
+      const sitePlan = documents.find(d => d.name === "Site Plan.pdf");
+      const result = await aiService.validateDocument("Site Plan", "PDF", sitePlan?.data);
       
       setDocuments(docs => docs.map(d => {
         if (d.name === "Site Plan.pdf") {

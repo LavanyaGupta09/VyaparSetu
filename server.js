@@ -99,8 +99,9 @@ app.post('/api/ai/roadmap', async (req, res) => {
 // 3. Document Analysis & Validation
 app.post('/api/ai/validate-docs', async (req, res) => {
   try {
-    const { documentName, documentType } = req.body;
-    const prompt = `Simulate OCR and validation for a ${documentName} (${documentType}). Return a JSON object with 'extracted' (boolean), 'verified' (boolean), 'score' (number 0-100), and 'issues' (array of strings, empty if verified). Output ONLY valid JSON.`;
+    const { documentName, documentType, documentData } = req.body;
+    const dataStr = documentData ? JSON.stringify(documentData) : 'No data provided.';
+    const prompt = `Validate the following extracted OCR data for a ${documentName} (${documentType}). Extracted Data: ${dataStr}. Return a JSON object with 'extracted' (boolean, true if data is present), 'verified' (boolean, true if data seems valid for this document type), 'score' (number 0-100), and 'issues' (array of strings, empty if verified). Output ONLY valid JSON.`;
     
     const reply = await callGroqAPI([
       { role: 'system', content: 'You are an AI document parser. Output ONLY valid JSON.' },

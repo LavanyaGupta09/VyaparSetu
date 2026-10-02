@@ -136,11 +136,11 @@ ${JSON.stringify(context, null, 2)}`
     return data.schemes || [];
   },
 
-  validateDocument: async (documentName: string, documentType: string) => {
+  validateDocument: async (documentName: string, documentType: string, documentData?: any) => {
     const response = await fetch('/api/ai/validate-docs', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ documentName, documentType }),
+      body: JSON.stringify({ documentName, documentType, documentData }),
     });
     const data = await response.json();
     return data.validation;
