@@ -89,7 +89,8 @@ export const DependencyGraph3D: React.FC<DependencyGraph3DProps> = ({ nodes, edg
     nodes.forEach((node, idx) => {
       const row = Math.floor(idx / cols);
       const col = idx % cols;
-      pos[node.id] = [(col - 1) * 3.5, -row * 2.0 + 1.5, (row % 2) * 0.5]; 
+      // Increased spacing between nodes (x: 5.0, y: 3.0) to prevent HTML labels from overlapping
+      pos[node.id] = [(col - 1) * 5.0, -row * 3.0 + 1.5, (row % 2) * 1.0]; 
     });
     return pos;
   }, [nodes]);
@@ -119,32 +120,30 @@ export const DependencyGraph3D: React.FC<DependencyGraph3DProps> = ({ nodes, edg
   return (
     <div className="w-full h-full min-h-[500px] cursor-grab active:cursor-grabbing bg-slate-900 rounded-2xl overflow-hidden relative">
       <ErrorBoundary fallback={fallback2D}>
-        <Canvas camera={{ position: [0, 8, 12], fov: 45 }}>
+        <Canvas camera={{ position: [0, 2, 16], fov: 45 }}>
           <ambientLight intensity={1.5} />
           <directionalLight position={[10, 20, 10]} intensity={2} />
           <pointLight position={[-10, -10, -10]} intensity={0.5} />
           
-          <Bounds fit clip observe margin={1.5}>
-            <group position={[0, -0.5, 0]}>
-              {edges.map((edge, idx) => {
-                const start = nodePositions[edge.source];
-                const end = nodePositions[edge.target];
-                if (!start || !end) return null;
-                return <Edge key={idx} start={start} end={end} />;
-              })}
+          <group position={[0, -0.5, 0]}>
+            {edges.map((edge, idx) => {
+              const start = nodePositions[edge.source];
+              const end = nodePositions[edge.target];
+              if (!start || !end) return null;
+              return <Edge key={idx} start={start} end={end} />;
+            })}
 
-              {nodes.map((node) => (
-                <Node 
-                  key={node.id}
-                  position={nodePositions[node.id]}
-                  label={node.name}
-                  isSelected={selectedId === node.id}
-                  onClick={() => onNodeSelect(node.id)}
-                  color={node.department === 'MIDC' ? '#10b981' : '#3b82f6'}
-                />
-              ))}
-            </group>
-          </Bounds>
+            {nodes.map((node) => (
+              <Node 
+                key={node.id}
+                position={nodePositions[node.id]}
+                label={node.name}
+                isSelected={selectedId === node.id}
+                onClick={() => onNodeSelect(node.id)}
+                color={node.department === 'MIDC' ? '#10b981' : '#3b82f6'}
+              />
+            ))}
+          </group>
 
           <OrbitControls 
             makeDefault
