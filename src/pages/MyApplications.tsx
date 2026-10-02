@@ -18,6 +18,9 @@ const MyApplications = () => {
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [treePaid, setTreePaid] = useState(() => localStorage.getItem('demo_tree_paid') === 'true');
+
   
   // Calculate summary counts
   const summary = useMemo(() => {
@@ -110,7 +113,7 @@ const MyApplications = () => {
             <p className="text-sm text-slate-600">You have 3 approvals that can be started simultaneously.</p>
           </div>
         </div>
-        <button className="w-full sm:w-auto px-4 py-2 bg-white border border-blue-200 text-accent rounded-lg text-sm font-bold hover:bg-blue-50 transition-colors shadow-sm whitespace-nowrap">
+        <button onClick={() => navigate('/coming-soon')} className="w-full sm:w-auto px-4 py-2 bg-white border border-blue-200 text-accent rounded-lg text-sm font-bold hover:bg-blue-50 transition-colors shadow-sm whitespace-nowrap">
           Start in Bulk
         </button>
       </div>
@@ -272,7 +275,7 @@ const MyApplications = () => {
                         </button>
                         <div className="absolute right-0 bottom-full mb-1 w-48 bg-white border border-slate-200 shadow-xl rounded-lg py-1 hidden group-hover:block z-20">
                           <button onClick={() => handleAction(app, 'view')} className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2"><Eye className="w-3.5 h-3.5"/> View Details</button>
-                          <button className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2"><Download className="w-3.5 h-3.5"/> Download Summary</button>
+                          <button onClick={() => navigate('/coming-soon')} className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2"><Download className="w-3.5 h-3.5"/> Download Summary</button>
                           <div className="border-t border-slate-100 my-1"></div>
                           <button onClick={() => handleAction(app, 'withdraw')} className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2"><Trash2 className="w-3.5 h-3.5"/> Withdraw</button>
                         </div>
@@ -291,15 +294,17 @@ const MyApplications = () => {
               <AlertCircle className="w-5 h-5" /> Today's Focus
             </h3>
             <div className="space-y-4">
-              <div className="bg-white/10 p-3 rounded-xl border border-white/10">
-                <span className="text-[10px] uppercase font-bold text-indigo-300">Overdue</span>
-                <p className="text-sm font-medium mt-1">Submit Tree Cutting Replantation deposit</p>
-                <button className="mt-3 w-full py-1.5 bg-white text-indigo-900 text-xs font-bold rounded-lg hover:bg-indigo-50">Pay Now</button>
-              </div>
+              {!treePaid && (
+                <div className="bg-white/10 p-3 rounded-xl border border-white/10">
+                  <span className="text-[10px] uppercase font-bold text-indigo-300">Overdue</span>
+                  <p className="text-sm font-medium mt-1">Submit Tree Cutting Replantation deposit</p>
+                  <button onClick={() => setShowPayment(true)} className="mt-3 w-full py-1.5 bg-white text-indigo-900 text-xs font-bold rounded-lg hover:bg-indigo-50 transition-colors">Pay Now</button>
+                </div>
+              )}
               <div className="bg-white/10 p-3 rounded-xl border border-white/10">
                 <span className="text-[10px] uppercase font-bold text-amber-300">Action Required</span>
                 <p className="text-sm font-medium mt-1">Reply to queries on Pollution CTE</p>
-                <button className="mt-3 w-full py-1.5 border border-white/30 text-white text-xs font-bold rounded-lg hover:bg-white/10">View Query</button>
+                <button onClick={() => navigate('/query?name=Reply+to+queries+on+Pollution+CTE')} className="mt-3 w-full py-1.5 border border-white/30 text-white text-xs font-bold rounded-lg hover:bg-white/10 transition-colors">View Query</button>
               </div>
             </div>
           </div>
@@ -343,6 +348,49 @@ const MyApplications = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Payment Modal */}
+      <AnimatePresence>
+        {showPayment && (
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden"
+            >
+              <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900">Simulated Payment</h2>
+                  <p className="text-xs font-bold text-amber-600 uppercase tracking-wide mt-1">Demo Payment — Simulated for prototype</p>
+                </div>
+                <button onClick={() => setShowPayment(false)} className="p-2 bg-white rounded-full border border-slate-200 text-slate-500 hover:bg-slate-100"><X className="w-5 h-5"/></button>
+              </div>
+              <div className="p-6">
+                <div className="mb-6 bg-slate-50 border border-slate-100 rounded-xl p-4">
+                  <p className="text-sm text-slate-500 mb-1">Item Description</p>
+                  <p className="font-bold text-slate-800 mb-4">Tree Cutting Replantation deposit</p>
+                  
+                  <div className="flex justify-between items-end border-t border-slate-200 pt-4">
+                    <p className="text-sm text-slate-500">Amount Due</p>
+                    <p className="text-2xl font-bold text-primary-900">₹ 25,000</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => {
+                    localStorage.setItem('demo_tree_paid', 'true');
+                    setTreePaid(true);
+                    setShowPayment(false);
+                  }}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors"
+                >
+                  Confirm Payment (Mock)
+                </button>
               </div>
             </motion.div>
           </div>

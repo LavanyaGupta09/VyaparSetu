@@ -19,6 +19,7 @@ import SiteAdvisor from './pages/SiteAdvisor';
 import ProcessVisualizer from './pages/ProcessVisualizer';
 import DataSources from './pages/DataSources';
 import MyApplications from './pages/MyApplications';
+import QueryDetail from './pages/QueryDetail';
 import { CommandPalette } from './components/CommandPalette';
 import { UserRoleProvider } from './context/UserRoleContext';
 import { DemoControlProvider } from './context/DemoControlContext';
@@ -44,6 +45,7 @@ function App() {
               <Route path="/schemes" element={<SchemeMatch />} />
               <Route path="/ai" element={<MitraAI />} />
               <Route path="/application" element={<ApplicationForm />} />
+              <Route path="/query" element={<QueryDetail />} />
               <Route path="/certificate/:id" element={<CertificateView />} />
               <Route path="/admin/rules" element={<RulesRegistry />} />
               <Route path="/settings/consent" element={<ConsentLedger />} />

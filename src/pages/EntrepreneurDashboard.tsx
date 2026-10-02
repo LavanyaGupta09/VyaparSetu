@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, AlertCircle, Clock, FileText, ArrowRight, Activity, Calendar, Zap, FileSearch, Download } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDemoControl } from '../context/DemoControlContext';
 import { TiltCard, FloatingPanel, Icon3D, PressableButton3D, ScrollReveal3D, CommandCenterOrbs } from '../components/3d';
 
 const EntrepreneurDashboard = () => {
   const [applications, setApplications] = useState<any[]>([]);
   const { timeOffsetDays } = useDemoControl();
+  const navigate = useNavigate();
 
   const loadApps = () => {
     const stored = localStorage.getItem('maha_applications') || localStorage.getItem('vyapar_applications');
@@ -125,7 +126,10 @@ const EntrepreneurDashboard = () => {
                       {action.time}
                     </span>
                     {action.type === 'high' && (
-                      <button className="text-xs font-medium text-accent mt-2 hover:underline">Act now</button>
+                      <button onClick={() => {
+                        if (action.title.includes('Upload')) navigate('/query');
+                        else navigate('/coming-soon');
+                      }} className="text-xs font-medium text-accent mt-2 hover:underline">Act now</button>
                     )}
                   </div>
                 </motion.div>
