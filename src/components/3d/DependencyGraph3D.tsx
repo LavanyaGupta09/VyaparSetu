@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Line, Html, Bounds } from '@react-three/drei';
+import { OrbitControls, Line, Html, Center } from '@react-three/drei';
 import * as THREE from 'three';
 import { useReducedMotion } from 'framer-motion';
 
@@ -125,25 +125,27 @@ export const DependencyGraph3D: React.FC<DependencyGraph3DProps> = ({ nodes, edg
           <directionalLight position={[10, 20, 10]} intensity={2} />
           <pointLight position={[-10, -10, -10]} intensity={0.5} />
           
-          <group position={[0, -0.5, 0]}>
-            {edges.map((edge, idx) => {
-              const start = nodePositions[edge.from];
-              const end = nodePositions[edge.to];
-              if (!start || !end) return null;
-              return <Edge key={idx} start={start} end={end} />;
-            })}
+          <Center>
+            <group>
+              {edges.map((edge, idx) => {
+                const start = nodePositions[edge.from];
+                const end = nodePositions[edge.to];
+                if (!start || !end) return null;
+                return <Edge key={idx} start={start} end={end} />;
+              })}
 
-            {nodes.map((node) => (
-              <Node 
-                key={node.id}
-                position={nodePositions[node.id]}
-                label={node.name}
-                isSelected={selectedId === node.id}
-                onClick={() => onNodeSelect(node.id)}
-                color={node.department === 'MIDC' ? '#10b981' : '#3b82f6'}
-              />
-            ))}
-          </group>
+              {nodes.map((node) => (
+                <Node 
+                  key={node.id}
+                  position={nodePositions[node.id]}
+                  label={node.name}
+                  isSelected={selectedId === node.id}
+                  onClick={() => onNodeSelect(node.id)}
+                  color={node.department === 'MIDC' ? '#10b981' : '#3b82f6'}
+                />
+              ))}
+            </group>
+          </Center>
 
           <OrbitControls 
             makeDefault
