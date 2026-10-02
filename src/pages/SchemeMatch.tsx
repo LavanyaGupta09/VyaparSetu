@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Bookmark, ExternalLink, Loader2, X } from 'lucide-react';
+import { Sparkles, Bookmark, ExternalLink, Loader2, X, ChevronDown, CheckCircle2, Info, FileText } from 'lucide-react';
 import { aiService } from '../services/aiService';
 
 const SchemeMatch = () => {
@@ -9,21 +9,31 @@ const SchemeMatch = () => {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedScheme, setSelectedScheme] = useState<any>(null);
-  const [schemeDetails, setSchemeDetails] = useState('');
+  const [schemeDetails, setSchemeDetails] = useState<any>(null);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
 
   const viewSchemeDetails = async (scheme: any) => {
     setSelectedScheme(scheme);
     setIsDetailLoading(true);
-    setSchemeDetails('');
+    setSchemeDetails(null);
     try {
-      const reply = await aiService.chat([
-        { role: 'system', content: 'You are an expert on Maharashtra government schemes. Given a scheme title and description, explain the eligibility criteria, required documents, and how to apply in 3 short bullet points. Do not use markdown headers.' },
+      const replyStr = await aiService.chat([
+        { role: 'system', content: 'You are an expert on Maharashtra government schemes. Given a scheme title and description, provide structured details. Fill the whyRequired field, list the required documents, set the authority, and status. Output strictly as JSON following the schema.' },
         { role: 'user', content: `Scheme: ${scheme.title}\nDescription: ${scheme.desc}` }
       ], { locale: 'en' });
-      setSchemeDetails(reply);
+      
+      let replyData;
+      try {
+        replyData = JSON.parse(replyStr);
+      } catch (parseErr) {
+        console.error("Failed to parse scheme details JSON", parseErr);
+        replyData = { cards: [{ whyRequired: replyStr }] };
+      }
+      
+      const card = replyData.cards && replyData.cards.length > 0 ? replyData.cards[0] : replyData;
+      setSchemeDetails(card);
     } catch (e) {
-      setSchemeDetails('Failed to load scheme details. Please try again later.');
+      setSchemeDetails({ message: 'Failed to load scheme details. Please try again later.' });
     } finally {
       setIsDetailLoading(false);
     }
@@ -122,11 +132,67 @@ const SchemeMatch = () => {
                   <Loader2 className="w-8 h-8 text-accent animate-spin mb-3" />
                   <p className="text-sm">Groq AI is analyzing this scheme...</p>
                 </div>
-              ) : (
-                <div className="bg-blue-50/50 rounded-xl p-4 text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
-                  {schemeDetails}
+              ) : schemeDetails ? (
+                <div className="space-y-4 text-sm mt-4">
+                  <div className="p-4 border border-accent/20 bg-blue-50/50 rounded-xl flex items-center justify-between">
+                    <div>
+                      <span className="text-slate-500 block mb-1 text-xs">Authority</span>
+                      <span className="font-semibold text-accent">{schemeDetails.authority || 'State Government'}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-slate-500 block mb-1 text-xs">Status</span>
+                      <span className="font-medium text-emerald-600 bg-emerald-50 px-2 py-1 border border-emerald-100 rounded-md">{schemeDetails.status || 'Active'}</span>
+                    </div>
+                  </div>
+
+                  <details className="group border border-slate-200 rounded-xl bg-white overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                    <summary className="flex items-center justify-between p-4 font-medium cursor-pointer list-none bg-slate-50 hover:bg-slate-100 transition-colors">
+                      <div className="flex items-center gap-2 text-slate-700">
+                        <Info className="w-4 h-4 text-accent" />
+                        Why is this required?
+                      </div>
+                      <span className="transition group-open:rotate-180">
+                        <ChevronDown className="w-5 h-5 text-slate-400" />
+                      </span>
+                    </summary>
+                    <div className="p-4 border-t border-slate-100 text-slate-600 leading-relaxed">
+                      {schemeDetails.whyRequired || schemeDetails.message || schemeDetails.desc || 'Provides crucial support based on your business profile.'}
+                    </div>
+                  </details>
+
+                  <details className="group border border-slate-200 rounded-xl bg-white overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                    <summary className="flex items-center justify-between p-4 font-medium cursor-pointer list-none bg-slate-50 hover:bg-slate-100 transition-colors">
+                      <div className="flex items-center gap-2 text-slate-700">
+                        <FileText className="w-4 h-4 text-accent" />
+                        Required Documents
+                      </div>
+                      <span className="transition group-open:rotate-180">
+                        <ChevronDown className="w-5 h-5 text-slate-400" />
+                      </span>
+                    </summary>
+                    <div className="p-4 border-t border-slate-100">
+                      <ul className="space-y-3">
+                        {schemeDetails.documents && schemeDetails.documents.length > 0 ? (
+                          schemeDetails.documents.map((doc: string, idx: number) => (
+                            <li key={idx} className="flex items-start gap-2 text-slate-600">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" /> 
+                              <span>{doc}</span>
+                            </li>
+                          ))
+                        ) : (
+                          <li className="text-slate-500 italic">No specific documents listed.</li>
+                        )}
+                      </ul>
+                    </div>
+                  </details>
+
+                  <div className="pt-4 mt-6 border-t border-slate-100">
+                    <button className="w-full flex items-center justify-center gap-2 bg-accent hover:bg-accent/90 text-white py-3 rounded-xl font-bold shadow-lg shadow-accent/20 transition-all">
+                      {schemeDetails.actionLabel || 'Apply for Scheme'} <ExternalLink className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

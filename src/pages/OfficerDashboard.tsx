@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { aiService } from '../services/aiService';
 import { fetchGovDataStats } from '../services/publicApis';
 import { useTranslation } from 'react-i18next';
+import { TiltCard } from '../components/TiltCard';
 import { ResponsiveContainer, BarChart, XAxis, Tooltip, Bar } from 'recharts';
 
 const applications = [
@@ -64,9 +65,10 @@ const OfficerDashboard = () => {
         <p className="text-slate-500 text-sm mt-1">AI-assisted application processing and query generation.</p>
         
         {govStats && govStats.data && govStats.data.records && (
-          <div className="mt-6 p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-slate-800 flex items-center gap-2">
+          <TiltCard className="mt-6 block w-full">
+            <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm h-full w-full">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-bold text-slate-800 flex items-center gap-2">
                 <BarChart2 className="w-5 h-5 text-indigo-600" />
                 Public Data Insights: MSMEs by District (Maharashtra)
               </h3>
@@ -87,7 +89,8 @@ const OfficerDashboard = () => {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          </div>
+            </div>
+          </TiltCard>
         )}
       </div>
 
@@ -136,7 +139,7 @@ const OfficerDashboard = () => {
                   <p className="text-slate-500 text-sm">Application: {selectedApp.id} • {selectedApp.type}</p>
                 </div>
                 <div className="flex gap-2">
-                  <button className="px-4 py-2 bg-emerald-50 text-emerald-700 font-medium text-sm rounded-lg border border-emerald-200 hover:bg-emerald-100 transition-colors flex items-center gap-1">
+                  <button className="btn-3d px-4 py-2 bg-emerald-50 text-emerald-700 font-medium text-sm rounded-lg border border-emerald-200 hover:bg-emerald-100 transition-colors flex items-center gap-1">
                     <CheckCircle2 className="w-4 h-4" /> Approve
                   </button>
                 </div>
@@ -153,7 +156,7 @@ const OfficerDashboard = () => {
                   <button 
                     onClick={generateSummary}
                     disabled={isGenerating}
-                    className="p-4 bg-white rounded-xl border border-blue-100 shadow-sm hover:shadow-md transition-all text-left group disabled:opacity-50"
+                    className="btn-3d p-4 bg-white rounded-xl border border-blue-100 shadow-sm hover:shadow-md transition-all text-left group disabled:opacity-50"
                   >
                     <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                       <FileText className="w-5 h-5 text-accent" />
@@ -165,7 +168,7 @@ const OfficerDashboard = () => {
                   <button 
                     onClick={generateDraft}
                     disabled={isGenerating}
-                    className="p-4 bg-white rounded-xl border border-blue-100 shadow-sm hover:shadow-md transition-all text-left group disabled:opacity-50"
+                    className="btn-3d p-4 bg-white rounded-xl border border-blue-100 shadow-sm hover:shadow-md transition-all text-left group disabled:opacity-50"
                   >
                     <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                       <Mail className="w-5 h-5 text-amber-600" />
@@ -201,8 +204,8 @@ const OfficerDashboard = () => {
                       {draftQuery}
                     </div>
                     <div className="mt-4 flex justify-end gap-2">
-                      <button className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50">Edit</button>
-                      <button className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-hover flex items-center gap-2"><Mail className="w-4 h-4"/> Send to Applicant</button>
+                      <button className="btn-3d px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50">Edit</button>
+                      <button className="btn-3d px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-hover flex items-center gap-2"><Mail className="w-4 h-4"/> Send to Applicant</button>
                     </div>
                   </motion.div>
                 )}

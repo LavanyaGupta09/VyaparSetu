@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { CheckCircle2, AlertCircle, Clock, FileText, ArrowRight, Activity, Calendar, Zap, FileSearch, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useDemoControl } from '../context/DemoControlContext';
+import { TiltCard } from '../components/TiltCard';
 
 const EntrepreneurDashboard = () => {
   const [applications, setApplications] = useState<any[]>([]);
@@ -36,42 +37,50 @@ const EntrepreneurDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
-          <div>
-            <p className="text-sm font-medium text-slate-500 mb-1">Approval Health</p>
-            <h3 className="text-3xl font-bold text-emerald-600">78%</h3>
+        <TiltCard>
+          <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between h-full w-full">
+            <div>
+              <p className="text-sm font-medium text-slate-500 mb-1">Approval Health</p>
+              <h3 className="text-3xl font-bold text-emerald-600">78%</h3>
+            </div>
+            <div className="mt-4 flex items-center text-xs font-medium text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-full">
+              <CheckCircle2 className="w-3 h-3 mr-1" /> On track
+            </div>
           </div>
-          <div className="mt-4 flex items-center text-xs font-medium text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-full">
-            <CheckCircle2 className="w-3 h-3 mr-1" /> On track
+        </TiltCard>
+        <TiltCard>
+          <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between h-full w-full">
+            <div>
+              <p className="text-sm font-medium text-slate-500 mb-1">Pending Actions</p>
+              <h3 className="text-3xl font-bold text-primary-900">4</h3>
+            </div>
+            <Link to="/actions" className="mt-4 text-xs font-medium text-accent hover:text-accent-hover flex items-center">
+              View all <ArrowRight className="w-3 h-3 ml-1" />
+            </Link>
           </div>
-        </div>
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
-          <div>
-            <p className="text-sm font-medium text-slate-500 mb-1">Pending Actions</p>
-            <h3 className="text-3xl font-bold text-primary-900">4</h3>
+        </TiltCard>
+        <TiltCard>
+          <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between h-full w-full">
+            <div>
+              <p className="text-sm font-medium text-slate-500 mb-1">Upcoming Deadlines</p>
+              <h3 className="text-3xl font-bold text-primary-900">3</h3>
+            </div>
+            <Link to="/calendar" className="mt-4 text-xs font-medium text-accent hover:text-accent-hover flex items-center">
+              View calendar <ArrowRight className="w-3 h-3 ml-1" />
+            </Link>
           </div>
-          <Link to="/actions" className="mt-4 text-xs font-medium text-accent hover:text-accent-hover flex items-center">
-            View all <ArrowRight className="w-3 h-3 ml-1" />
-          </Link>
-        </div>
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
-          <div>
-            <p className="text-sm font-medium text-slate-500 mb-1">Upcoming Deadlines</p>
-            <h3 className="text-3xl font-bold text-primary-900">3</h3>
+        </TiltCard>
+        <TiltCard>
+          <div className="bg-gradient-to-br from-indigo-500 to-accent p-6 rounded-2xl shadow-sm text-white flex flex-col justify-between h-full w-full">
+            <div>
+              <p className="text-sm font-medium text-blue-100 mb-1">Scheme Opportunities</p>
+              <h3 className="text-3xl font-bold">6</h3>
+            </div>
+            <Link to="/schemes" className="mt-4 text-xs font-medium text-white hover:text-blue-50 flex items-center bg-white/20 w-fit px-3 py-1.5 rounded-full backdrop-blur-sm btn-3d">
+              Explore now <ArrowRight className="w-3 h-3 ml-1" />
+            </Link>
           </div>
-          <Link to="/calendar" className="mt-4 text-xs font-medium text-accent hover:text-accent-hover flex items-center">
-            View calendar <ArrowRight className="w-3 h-3 ml-1" />
-          </Link>
-        </div>
-        <div className="bg-gradient-to-br from-indigo-500 to-accent p-6 rounded-2xl shadow-sm text-white flex flex-col justify-between">
-          <div>
-            <p className="text-sm font-medium text-blue-100 mb-1">Scheme Opportunities</p>
-            <h3 className="text-3xl font-bold">6</h3>
-          </div>
-          <Link to="/schemes" className="mt-4 text-xs font-medium text-white hover:text-blue-50 flex items-center bg-white/20 w-fit px-3 py-1.5 rounded-full backdrop-blur-sm">
-            Explore now <ArrowRight className="w-3 h-3 ml-1" />
-          </Link>
-        </div>
+        </TiltCard>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -90,13 +99,14 @@ const EntrepreneurDashboard = () => {
               { title: "Renewal due in 28 days", desc: "Factory license renewal", type: "low", time: "Next month", icon: Calendar }
             ].map((action, i) => (
               <div key={i} className="p-4 hover:bg-slate-50 transition-colors flex items-start gap-4 cursor-pointer">
-                <div className={`p-2 rounded-lg ${
+                <div className={`p-2 rounded-lg icon-3d-container ${
                   action.type === 'high' ? 'bg-red-50 text-red-600' :
                   action.type === 'medium' ? 'bg-amber-50 text-amber-600' :
                   action.type === 'info' ? 'bg-blue-50 text-blue-600' :
                   'bg-slate-100 text-slate-500'
                 }`}>
-                  <action.icon className="w-5 h-5" />
+                  <action.icon className="w-5 h-5 relative z-10" />
+                  <action.icon className="w-5 h-5 icon-3d-shadow" />
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-slate-800 text-sm">{action.title}</h4>
@@ -171,7 +181,7 @@ const EntrepreneurDashboard = () => {
               </p>
             </div>
             <div>
-              <Link to="/roadmap" className="w-full bg-white text-primary-900 py-3 rounded-xl font-medium text-sm flex justify-center items-center hover:bg-blue-50 transition-colors shadow-lg shadow-black/20">
+              <Link to="/roadmap" className="btn-3d w-full bg-white text-primary-900 py-3 rounded-xl font-medium text-sm flex justify-center items-center hover:bg-blue-50 transition-colors shadow-lg shadow-black/20">
                 View Smart Roadmap
               </Link>
             </div>

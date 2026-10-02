@@ -43,9 +43,11 @@ const ExplainPanel: React.FC<ExplainPanelProps> = ({ evaluation, isOpen, onClose
     <AnimatePresence>
       <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <motion.div 
-          initial={{ opacity: 0, y: 10, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+          initial={{ opacity: 0, y: 30, scale: 0.9, rotateX: 15 }}
+          animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+          exit={{ opacity: 0, y: 20, scale: 0.95, rotateX: -10 }}
+          transition={{ duration: 0.3, type: 'spring', damping: 25, stiffness: 300 }}
+          style={{ transformPerspective: 1200 }}
           className="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden flex flex-col max-h-[90vh]"
         >
           <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">

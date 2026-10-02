@@ -36,7 +36,7 @@ export const fetchGovDataStats = async (resourceId: string = '386ce542-8e39-4c4c
   return fetchWithResilience(
     `datagov_${resourceId}`,
     async () => {
-      const response = await fetch(`http://localhost:3000/api/public/datagov?resource=${resourceId}&limit=100`);
+      const response = await fetch(`/api/public/datagov?resource=${resourceId}&limit=100`);
       if (!response.ok) throw new Error('DataGov API error or rate limit');
       
       const rawData = await response.json();

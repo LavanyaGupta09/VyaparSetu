@@ -19,7 +19,7 @@ export const fetchNearbyInfrastructure = async (lat: number, lon: number): Promi
     `infra_${lat.toFixed(3)}_${lon.toFixed(3)}`,
     async () => {
       // Proxied through the backend to prevent CORS issues and abuse
-      const response = await fetch(`http://localhost:3000/api/public/overpass?lat=${lat}&lon=${lon}`);
+      const response = await fetch(`/api/public/overpass?lat=${lat}&lon=${lon}`);
       if (!response.ok) throw new Error('Overpass API error');
       const data = await response.json();
       return data;

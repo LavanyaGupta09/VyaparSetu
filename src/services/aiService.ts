@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api/ai/chat';
+const API_URL = '/api/ai/chat';
 
 async function callAI(messages: any[], locale: string = 'en') {
   const response = await fetch(API_URL, {
@@ -62,8 +62,18 @@ ${JSON.stringify(context, null, 2)}`
         return aiService.chat(messages, context, retries - 1);
       }
       return JSON.stringify({
-        message: "I'm having trouble formatting my response right now, but I'm here to help. Could you try asking your question slightly differently?",
-        cards: []
+        message: "I'm having trouble connecting to the AI backend right now, but here is standard information.",
+        cards: [
+          {
+            title: "Government Scheme / Approval",
+            status: "Active",
+            authority: "State Government",
+            whyRequired: "Provides crucial support or regulatory compliance based on your business profile.",
+            documents: ["Business Registration Certificate", "Identity Proof", "Bank Account Details"],
+            actionLabel: "Apply Now",
+            actionType: "apply"
+          }
+        ]
       });
     }
   },
@@ -117,7 +127,7 @@ ${JSON.stringify(context, null, 2)}`
   },
 
   findSchemes: async (profile: any) => {
-    const response = await fetch('http://localhost:3000/api/ai/schemes', {
+    const response = await fetch('/api/ai/schemes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ profile }),
@@ -127,7 +137,7 @@ ${JSON.stringify(context, null, 2)}`
   },
 
   validateDocument: async (documentName: string, documentType: string) => {
-    const response = await fetch('http://localhost:3000/api/ai/validate-docs', {
+    const response = await fetch('/api/ai/validate-docs', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ documentName, documentType }),
@@ -137,7 +147,7 @@ ${JSON.stringify(context, null, 2)}`
   },
 
   extractDocumentData: async (base64: string, fileType: string) => {
-    const response = await fetch('http://localhost:3000/api/ocr/extract', {
+    const response = await fetch('/api/ocr/extract', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ base64, fileType }),

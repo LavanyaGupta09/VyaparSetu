@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Download, CheckCircle2, Clock, AlertCircle, Lock, ArrowRight, Play, Info, Beaker, Calendar } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { evaluateProfile, buildDependencyGraph, type Profile, type RuleEvaluation } from '../engine/rulesEngine';
 import ExplainPanel from '../components/ExplainPanel';
 import { calculateSlaDeadline } from '../services/publicApis';
@@ -45,23 +46,25 @@ const ApprovalRoadmap = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Link to="/roadmap/what-if" className="flex items-center px-4 py-2 bg-accent/10 border border-accent/20 text-accent rounded-lg text-sm font-medium hover:bg-accent/20 transition-colors shadow-sm">
+          <Link to="/roadmap/what-if" className="btn-3d flex items-center px-4 py-2 bg-accent/10 border border-accent/20 text-accent rounded-lg text-sm font-medium hover:bg-accent/20 transition-colors shadow-sm">
             <Beaker className="w-4 h-4 mr-2" /> Try What-If
           </Link>
-          <button className="flex items-center px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors shadow-sm">
+          <button className="btn-3d flex items-center px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors shadow-sm">
             <Download className="w-4 h-4 mr-2" /> Download
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm p-6 overflow-x-auto min-h-[500px]">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative">
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm p-6 overflow-x-auto min-h-[500px] relative overflow-hidden">
+          {/* Subtle Parallax Background Grid */}
+          <div className="absolute inset-0 pointer-events-none opacity-20 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
           {evaluations.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-slate-500">
+            <div className="flex flex-col items-center justify-center h-full text-slate-500 relative z-10">
               <p>No approvals required based on current rules.</p>
             </div>
           ) : (
-            <div className="min-w-[600px] flex flex-col items-center">
+            <div className="min-w-[600px] flex flex-col items-center relative z-10">
               {/* Start Node */}
               <div className="flex justify-center mb-8">
                 <div className="bg-primary-50 text-primary-700 px-6 py-2 rounded-full font-semibold border border-primary-100 text-sm">
@@ -70,26 +73,32 @@ const ApprovalRoadmap = () => {
               </div>
 
               {/* Dynamic Path Mapping (Simplified Linear/Parallel Visual for Demo) */}
-              <div className="flex flex-wrap justify-center gap-8 mb-8 relative w-full">
+              <div className="flex flex-wrap justify-center gap-8 mb-8 relative w-full perspective-1000">
                 {graph.nodes.map((node, i) => {
                   const ev = evaluations.find(e => e.approval.id === node.id);
                   const isSelected = selectedApproval?.approval.id === node.id;
                   
                   return (
-                    <div key={node.id} className="flex flex-col items-center relative" onClick={() => setSelectedApproval(ev)}>
-                      {i > 0 && <div className="absolute w-8 h-px bg-slate-200 top-1/2 -left-8"></div>}
-                      <div className={`border-2 rounded-xl p-4 w-64 shadow-sm flex flex-col items-center relative z-10 cursor-pointer transition-all ${
-                        isSelected ? 'border-accent ring-4 ring-accent/10 transform scale-105' : 'border-slate-200 hover:border-accent/50'
-                      }`}>
-                        <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center mb-3">
+                    <motion.div 
+                      key={node.id} 
+                      className="flex flex-col items-center relative preserve-3d" 
+                      onClick={() => setSelectedApproval(ev)}
+                      whileHover={{ scale: 1.05, translateZ: 30, rotateX: 5, rotateY: -5 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    >
+                      {i > 0 && <div className="absolute w-8 h-px bg-slate-300 top-1/2 -left-8 shadow-sm" style={{ transform: "translateZ(-10px)" }}></div>}
+                      <div className={`border-2 rounded-xl p-4 w-64 flex flex-col items-center relative z-10 cursor-pointer transition-all bg-white preserve-3d ${
+                        isSelected ? 'border-accent ring-4 ring-accent/10 transform scale-105 shadow-xl' : 'border-slate-200 hover:border-accent/50 shadow-md'
+                      }`} style={{ transform: isSelected ? "translateZ(20px)" : "translateZ(0px)" }}>
+                        <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center mb-3 transform" style={{ transform: "translateZ(10px)" }}>
                           <CheckCircle2 className={`w-5 h-5 ${isSelected ? 'text-accent' : 'text-slate-400'}`} />
                         </div>
-                        <h3 className="font-semibold text-slate-800 text-sm text-center">{node.name}</h3>
-                        <span className="text-xs font-medium text-slate-500 mt-1.5 px-2 py-0.5 bg-slate-50 rounded">
+                        <h3 className="font-semibold text-slate-800 text-sm text-center transform" style={{ transform: "translateZ(15px)" }}>{node.name}</h3>
+                        <span className="text-xs font-medium text-slate-500 mt-1.5 px-2 py-0.5 bg-slate-50 rounded transform" style={{ transform: "translateZ(5px)" }}>
                           {node.department}
                         </span>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
