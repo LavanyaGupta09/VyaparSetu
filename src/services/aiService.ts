@@ -142,6 +142,10 @@ ${JSON.stringify(context, null, 2)}`
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ documentName, documentType, documentData }),
     });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to validate document');
+    }
     const data = await response.json();
     return data.validation;
   },

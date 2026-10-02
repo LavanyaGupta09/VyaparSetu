@@ -24,6 +24,7 @@ import QueryDetail from './pages/QueryDetail';
 import { CommandPalette } from './components/CommandPalette';
 import { UserRoleProvider } from './context/UserRoleContext';
 import { DemoControlProvider } from './context/DemoControlContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import './i18n';
 
 function App() {
@@ -32,31 +33,33 @@ function App() {
       <DemoControlProvider>
         <BrowserRouter>
           <CommandPalette />
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/verify/:id" element={<VerifyCertificate />} />
-            <Route element={<DashboardLayout />}>
-              <Route path="/dashboard" element={<DashboardRouter />} />
-              <Route path="/roadmap" element={<ApprovalRoadmap />} />
-              <Route path="/roadmap/what-if" element={<WhatIfSimulator />} />
-              <Route path="/applications" element={<MyApplications />} />
-              <Route path="/documents" element={<DocumentVault />} />
-              <Route path="/calendar" element={<ComplianceCalendar />} />
-              <Route path="/schemes" element={<SchemeMatch />} />
-              <Route path="/ai" element={<MitraAI />} />
-              <Route path="/application" element={<ApplicationForm />} />
-              <Route path="/query" element={<QueryDetail />} />
-              <Route path="/certificate/:id" element={<CertificateView />} />
-              <Route path="/admin/rules" element={<RulesRegistry />} />
-              <Route path="/settings/consent" element={<ConsentLedger />} />
-              <Route path="/settings/data" element={<DataSources />} />
-              <Route path="/advisor" element={<SiteAdvisor />} />
-              <Route path="/bpr" element={<ProcessVisualizer />} />
-              <Route path="*" element={<ComingSoon />} />
-            </Route>
-          </Routes>
+          <ErrorBoundary>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/verify/:id" element={<VerifyCertificate />} />
+              <Route element={<DashboardLayout />}>
+                <Route path="/dashboard" element={<DashboardRouter />} />
+                <Route path="/roadmap" element={<ApprovalRoadmap />} />
+                <Route path="/roadmap/what-if" element={<WhatIfSimulator />} />
+                <Route path="/applications" element={<MyApplications />} />
+                <Route path="/documents" element={<DocumentVault />} />
+                <Route path="/calendar" element={<ComplianceCalendar />} />
+                <Route path="/schemes" element={<SchemeMatch />} />
+                <Route path="/ai" element={<MitraAI />} />
+                <Route path="/application" element={<ApplicationForm />} />
+                <Route path="/query" element={<QueryDetail />} />
+                <Route path="/certificate/:id" element={<CertificateView />} />
+                <Route path="/admin/rules" element={<RulesRegistry />} />
+                <Route path="/settings/consent" element={<ConsentLedger />} />
+                <Route path="/settings/data" element={<DataSources />} />
+                <Route path="/advisor" element={<SiteAdvisor />} />
+                <Route path="/bpr" element={<ProcessVisualizer />} />
+                <Route path="*" element={<ComingSoon />} />
+              </Route>
+            </Routes>
+          </ErrorBoundary>
         </BrowserRouter>
       </DemoControlProvider>
     </UserRoleProvider>

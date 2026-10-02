@@ -15,6 +15,7 @@ const DocumentVault = () => {
   
   const [isChecking, setIsChecking] = useState(false);
   const [score, setScore] = useState(87);
+  const [preCheckError, setPreCheckError] = useState('');
 
   // File Upload & OCR states
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -124,23 +125,28 @@ const DocumentVault = () => {
 
   const runAiPreCheck = async () => {
     setIsChecking(true);
+    setPreCheckError('');
     try {
       const sitePlan = documents.find(d => d.name === "Site Plan.pdf");
       const result = await aiService.validateDocument("Site Plan", "PDF", sitePlan?.data);
       
+      if (!result) {
+        throw new Error("Received empty or invalid response from AI.");
+      }
+      
+      const val = result.validation ? result.validation : result;
+      const newScore = val.score || 95;
+      
       setDocuments(docs => docs.map(d => {
         if (d.name === "Site Plan.pdf") {
-          // AI service returns the validation object directly now, or might return { validation: ... } if backend changed. 
-          // Let's handle both safely.
-          const val = result.validation ? result.validation : result;
           return { ...d, extracted: val.extracted, verified: val.verified, review: !val.verified };
         }
         return d;
       }));
-      const scoreObj = result.validation ? result.validation : result;
-      setScore(scoreObj.score || 95);
-    } catch (e) {
+      setScore(newScore);
+    } catch (e: any) {
       console.error(e);
+      setPreCheckError(e.message || 'Could not complete AI pre-check, please try again.');
     } finally {
       setIsChecking(false);
     }
@@ -305,6 +311,11 @@ const DocumentVault = () => {
             >
               {isChecking ? <><Loader2 className="w-4 h-4 animate-spin mr-2"/> Analyzing with Groq AI...</> : "Run Groq AI Pre-Check"}
             </PressableButton3D>
+            {preCheckError && (
+              <div className="mt-4 text-red-400 text-sm font-medium flex items-center justify-center gap-1.5 bg-red-400/10 px-3 py-2 rounded-lg border border-red-400/20">
+                <AlertCircle className="w-4 h-4" /> {preCheckError}
+              </div>
+            )}
           </div>
         </div>
       </div>
