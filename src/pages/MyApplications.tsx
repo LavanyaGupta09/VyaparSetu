@@ -10,6 +10,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { evaluateProfile } from '../engine/rulesEngine';
 
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 const MyApplications = () => {
   const { applications, updateApplication, deleteApplication, addApplication } = useApplications();
   const navigate = useNavigate();
@@ -19,7 +29,58 @@ const MyApplications = () => {
   const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [treePaid, setTreePaid] = useState(() => localStorage.getItem('demo_tree_paid') === 'true');
+
+  const handleRazorpayPayment = async () => {
+    setIsProcessingPayment(true);
+    const res = await loadRazorpayScript();
+
+    if (!res) {
+      alert('Razorpay SDK failed to load. Are you online?');
+      setIsProcessingPayment(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/payment/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: 25000 })
+      });
+      const order = await response.json();
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_dummy',
+        amount: order.amount,
+        currency: order.currency,
+        name: 'MAHA-SETU Government of Maharashtra',
+        description: 'Tree Cutting Replantation Deposit',
+        order_id: order.id,
+        handler: function (response: any) {
+          localStorage.setItem('demo_tree_paid', 'true');
+          setTreePaid(true);
+          setShowPayment(false);
+        },
+        prefill: {
+          name: 'Rohit Enterprises',
+          email: 'rohit@example.com',
+          contact: '9999999999'
+        },
+        theme: {
+          color: '#1e3a8a'
+        }
+      };
+
+      const paymentObject = new (window as any).Razorpay(options);
+      paymentObject.open();
+    } catch (err) {
+      console.error(err);
+      alert('Could not initiate payment. Please try again.');
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
 
   
   // Calculate summary counts
@@ -366,8 +427,8 @@ const MyApplications = () => {
             >
               <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <div>
-                  <h2 className="text-xl font-bold text-slate-900">Simulated Payment</h2>
-                  <p className="text-xs font-bold text-amber-600 uppercase tracking-wide mt-1">Demo Payment — Simulated for prototype</p>
+                  <h2 className="text-xl font-bold text-slate-900">Sandbox Payment</h2>
+                  <p className="text-xs font-bold text-amber-600 uppercase tracking-wide mt-1">Test Payment Environment - No real money is processed</p>
                 </div>
                 <button onClick={() => setShowPayment(false)} className="p-2 bg-white rounded-full border border-slate-200 text-slate-500 hover:bg-slate-100"><X className="w-5 h-5"/></button>
               </div>
@@ -382,14 +443,11 @@ const MyApplications = () => {
                   </div>
                 </div>
                 <button 
-                  onClick={() => {
-                    localStorage.setItem('demo_tree_paid', 'true');
-                    setTreePaid(true);
-                    setShowPayment(false);
-                  }}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors"
+                  onClick={handleRazorpayPayment}
+                  disabled={isProcessingPayment}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center"
                 >
-                  Confirm Payment (Mock)
+                  {isProcessingPayment ? 'Processing...' : 'Proceed to Sandbox Checkout'}
                 </button>
               </div>
             </motion.div>

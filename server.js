@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import Razorpay from 'razorpay';
 
 dotenv.config();
 
@@ -8,9 +9,19 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
-const GROQ_API_KEY = process.env.VITE_GROQ_API_KEY || process.env.GROQ_API_KEY;
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const OCR_API_KEY = process.env.OCR_API_KEY || 'K88203225988957';
 const DATA_GOV_API_KEY = process.env.DATA_GOV_API_KEY || '';
+const RAZORPAY_KEY_ID = process.env.VITE_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID;
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
+
+const razorpayInstance = new Razorpay({
+  key_id: RAZORPAY_KEY_ID || 'rzp_test_dummy',
+  key_secret: RAZORPAY_KEY_SECRET || 'dummy_secret'
+});
+
+console.log('--- STARTUP CHECK ---');
+console.log('GROQ_API_KEY present:', !!GROQ_API_KEY);
 
 async function callGroqAPI(messages, model = 'openai/gpt-oss-120b', temperature = 0.7) {
   if (!GROQ_API_KEY) throw new Error("GROQ_API_KEY is not set in environment variables");
@@ -37,6 +48,13 @@ async function callGroqAPI(messages, model = 'openai/gpt-oss-120b', temperature 
   return data.choices[0].message.content;
 }
 
+// Startup connection test
+if (GROQ_API_KEY) {
+  callGroqAPI([{ role: 'user', content: 'hello' }], 'openai/gpt-oss-20b', 0.1)
+    .then(reply => console.log('Groq startup test SUCCESS:', reply))
+    .catch(err => console.error('Groq startup test FAILED:', err.message));
+}
+
 // 0. Health Check
 app.get('/api/ai/health', async (req, res) => {
   try {
@@ -59,6 +77,7 @@ app.get('/api/ai/health', async (req, res) => {
 
 // 1. Universal AI Chat Endpoint
 app.post('/api/ai/chat', async (req, res) => {
+  console.log(`[POST] /api/ai/chat route hit at ${new Date().toISOString()}`);
   try {
     const { messages, context } = req.body;
     
@@ -274,6 +293,30 @@ app.get('/api/public/datagov', async (req, res) => {
   } catch (error) {
     console.error('DataGov Proxy Error:', error.message);
     res.status(503).json({ error: 'Failed to fetch from data.gov.in API', details: error.message });
+  }
+});
+
+// 8. Razorpay Order Generation
+app.post('/api/payment/create-order', async (req, res) => {
+  try {
+    const { amount, currency = 'INR', receipt = 'receipt#1' } = req.body;
+    
+    if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
+      console.warn("Razorpay keys missing, falling back to mock order");
+      return res.json({ id: 'order_mock_' + Date.now(), amount, currency });
+    }
+    
+    const options = {
+      amount: amount * 100, // amount in smallest currency unit (paise)
+      currency,
+      receipt
+    };
+    
+    const order = await razorpayInstance.orders.create(options);
+    res.json(order);
+  } catch (error) {
+    console.error('Razorpay Error:', error);
+    res.status(500).json({ error: error.message });
   }
 });
 
